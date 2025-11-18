@@ -1,0 +1,44 @@
+{
+  "name": "tube-joint-visualizer",
+  "version": "1.0.0",
+  "description": "Tube Joint Visualizer an interactive desktop app for designing rectangular/square tube joints.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": ["3d", "visualization", "tube", "joint", "cad"],
+  "build": {
+    "appId": "com.tubejoint.visualizer",
+    "productName": "Tube Joint Visualizer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": ["nsis"]
+    },
+    "mac": {
+      "target": ["dmg"]
+    },
+    "linux": {
+      "target": ["AppImage"]
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.181.1"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  }
+}
