@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tube Joint Visualizer</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Tube Joint Visualizer - Browser Test</title>
+    <link rel="stylesheet" href="src/renderer/styles.css">
 </head>
 <body>
     <div class="container">
         <!-- Control Panel -->
         <div class="control-panel">
             <h2>Tube Joint Visualizer</h2>
+            <p style="color: #4a9eff; font-size: 12px; margin-bottom: 15px;">Browser Test Version</p>
             
             <div class="section">
                 <h3>Tube Type</h3>
@@ -85,6 +86,11 @@
                 <div id="jointInfo">Joints: 0</div>
                 <div id="selectedInfo">Selected: None</div>
             </div>
+            
+            <div class="section">
+                <h3>Debug Console</h3>
+                <div id="debugConsole" style="background: #1a1a1a; padding: 10px; border-radius: 4px; font-size: 11px; max-height: 200px; overflow-y: auto; font-family: monospace; color: #00ff00;"></div>
+            </div>
         </div>
 
         <!-- 3D Viewport -->
@@ -97,7 +103,9 @@
                     Right Click + Drag: Pan view<br>
                     Mouse Wheel: Zoom<br>
                     Click Tube: Select<br>
-                    G: Grab/Move selected tube
+                    G: Grab/Move selected tube<br>
+                    <br>
+                    <strong>Check browser console (F12) for detailed logs!</strong>
                 </div>
             </div>
         </div>
@@ -106,11 +114,40 @@
     <script type="importmap">
     {
         "imports": {
-            "three": "../../node_modules/three/build/three.module.js",
-            "three/addons/": "../../node_modules/three/examples/jsm/"
+            "three": "./node_modules/three/build/three.module.js",
+            "three/addons/": "./node_modules/three/examples/jsm/"
         }
     }
     </script>
-    <script type="module" src="app.js"></script>
+    
+    <script>
+        // Debug console helper
+        const debugConsole = document.getElementById('debugConsole');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addDebugMessage(msg, type = 'log') {
+            const color = type === 'error' ? '#ff4444' : '#00ff00';
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = msg;
+            debugConsole.appendChild(line);
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addDebugMessage(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addDebugMessage('ERROR: ' + args.join(' '), 'error');
+        };
+        
+        console.log('🌐 Browser test version loaded');
+    </script>
+    
+    <script type="module" src="src/renderer/app.js"></script>
 </body>
 </html>
