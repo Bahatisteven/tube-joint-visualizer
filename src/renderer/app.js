@@ -1,5 +1,5 @@
 // App loader with error handling
-console.log('🚀 Tube Joint Visualizer Starting...');
+console.log('Tube Joint Visualizer Starting...');
 
 // Wait for DOM to be ready
 if (document.readyState === 'loading') {
@@ -9,12 +9,12 @@ if (document.readyState === 'loading') {
 }
 
 function init() {
-    console.log('📋 DOM Content Loaded');
+    console.log('DOM Content Loaded');
     
     // Add loading indicator
     const container = document.getElementById('canvas-container');
     if (!container) {
-        console.error('❌ Canvas container not found!');
+        console.error('Canvas container not found!');
         return;
     }
     
@@ -23,10 +23,10 @@ function init() {
     // Import and start the app
     import('./app-main.js')
         .then(() => {
-            console.log('✅ Application loaded successfully!');
+            console.log('Application loaded successfully!');
         })
         .catch((error) => {
-            console.error('❌ Failed to load application:', error);
+            console.error('Failed to load application:', error);
             container.innerHTML = `
                 <div style="color: #ff4444; padding: 20px;">
                     <h2>Error Loading Application</h2>

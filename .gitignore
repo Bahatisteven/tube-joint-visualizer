@@ -1,6 +1,8 @@
 # Progress tracking 
 PROGRESS.md
 TESTING.md
+test-server.sh
+TEST-NOW.md
 
 # Node modules
 node_modules/
