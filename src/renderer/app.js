@@ -20,7 +20,7 @@ function init() {
     
     container.innerHTML = '<div style="color: white; padding: 20px; text-align: center;">Loading 3D Engine...</div>';
     
-    // Import and start the app
+    // start the app
     import('./app-main.js')
         .then(() => {
             console.log('Application loaded successfully!');

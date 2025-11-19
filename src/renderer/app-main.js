@@ -2,9 +2,15 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
+
+
 // ============================================
 // MAIN APPLICATION CLASS
 // ============================================
+
+
+
+
 class TubeJointVisualizer {
     constructor() {
         this.scene = null;
@@ -26,7 +32,7 @@ class TubeJointVisualizer {
     }
 
     init() {
-        console.log('🎨 Initializing 3D scene...');
+        console.log('Initializing 3D scene...');
         
         // Create Scene
         this.scene = new THREE.Scene();
@@ -44,7 +50,7 @@ class TubeJointVisualizer {
         this.camera.lookAt(0, 0, 0);
         console.log('  ✓ Camera created');
 
-        // Create Renderer
+        // create Renderer
         const container = document.getElementById('canvas-container');
         if (!container) {
             throw new Error('Canvas container not found!');
@@ -56,7 +62,7 @@ class TubeJointVisualizer {
         container.appendChild(this.renderer.domElement);
         console.log('  ✓ Renderer created and attached');
 
-        // Add Lights
+        // add Lights
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         this.scene.add(ambientLight);
 
@@ -69,22 +75,22 @@ class TubeJointVisualizer {
         this.scene.add(directionalLight2);
         console.log('  ✓ Lights added');
 
-        // Add Grid Helper
+        // add Grid Helper
         const gridHelper = new THREE.GridHelper(1000, 20, 0x444444, 0x222222);
         this.scene.add(gridHelper);
 
-        // Add Axes Helper
+        // add Axes Helper
         const axesHelper = new THREE.AxesHelper(150);
         this.scene.add(axesHelper);
         console.log('  ✓ Grid and axes added');
 
-        // Setup Orbit Controls (camera rotation/zoom)
+        // setup Orbit Controls (camera rotation/zoom)
         this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
         this.orbitControls.enableDamping = true;
         this.orbitControls.dampingFactor = 0.05;
         console.log('  ✓ OrbitControls initialized');
 
-        // Setup Transform Controls (for moving tubes)
+        // setup Transform Controls (for moving tubes)
         this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
         this.transformControls.addEventListener('dragging-changed', (event) => {
             this.orbitControls.enabled = !event.value;
@@ -93,20 +99,20 @@ class TubeJointVisualizer {
         this.scene.add(this.transformControls);
         console.log('  ✓ TransformControls initialized');
 
-        // Raycaster for mouse picking
+        // raycaster for mouse picking
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
 
-        // Handle window resize
+        // handle window resize
         window.addEventListener('resize', () => this.onWindowResize());
         
-        console.log('✅ 3D scene initialization complete!');
+        console.log('3D scene initialization complete!');
     }
 
     setupEventListeners() {
-        console.log('🎛️  Setting up event listeners...');
+        console.log('Setting up event listeners...');
         
-        // Tube type change
+        // tube type change
         document.querySelectorAll('input[name="tubeType"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const heightGroup = document.getElementById('heightGroup');
@@ -119,7 +125,7 @@ class TubeJointVisualizer {
             });
         });
 
-        // Width change for square mode
+        // width change for square mode
         document.getElementById('width').addEventListener('input', (e) => {
             const tubeType = document.querySelector('input[name="tubeType"]:checked').value;
             if (tubeType === 'square') {
@@ -127,22 +133,22 @@ class TubeJointVisualizer {
             }
         });
 
-        // Add Tube button
+        // add Tube button
         document.getElementById('addTube').addEventListener('click', () => {
-            console.log('➕ Add Tube button clicked');
+            console.log('Add Tube button clicked');
             this.addTube();
         });
 
-        // Delete Tube button
+        // delete Tube button
         document.getElementById('deleteTube').addEventListener('click', () => {
-            console.log('🗑️  Delete Tube button clicked');
+            console.log('Delete Tube button clicked');
             this.deleteTube();
         });
 
-        // View mode change
+        // view mode change
         document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
-                console.log('👁️  View mode changed to:', e.target.value);
+                console.log('View mode changed to:', e.target.value);
                 this.viewMode = e.target.value;
                 this.updateViewMode();
             });
@@ -158,14 +164,14 @@ class TubeJointVisualizer {
             this.redo();
         });
 
-        // Mouse click for selection
+        // mouse click for selection
         this.renderer.domElement.addEventListener('click', (event) => this.onMouseClick(event));
 
-        // Keyboard shortcuts
+        // keyboard shortcuts
         document.addEventListener('keydown', (event) => {
             if (event.key === 'g' || event.key === 'G') {
                 if (this.selectedTube) {
-                    console.log('🎯 Grab mode activated');
+                    console.log('Grab mode activated');
                     this.transformControls.attach(this.selectedTube.mesh);
                 }
             }
@@ -219,7 +225,7 @@ class TubeJointVisualizer {
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
         
-        // Get all meshes from all tube groups (recursive)
+        // i'll get all meshes from all tube groups (recursive)
         const allMeshes = [];
         this.tubes.forEach(tube => {
             tube.mesh.traverse((child) => {
@@ -232,15 +238,15 @@ class TubeJointVisualizer {
         const intersects = this.raycaster.intersectObjects(allMeshes);
 
         if (intersects.length > 0) {
-            // Find which tube this mesh belongs to
+            // which tube this mesh belongs to
             const clickedMesh = intersects[0].object;
             const tube = this.tubes.find(t => t.mesh === clickedMesh.parent || clickedMesh.parent === t.mesh);
             if (tube) {
-                console.log('🖱️  Tube clicked:', tube);
+                console.log('  Tube clicked:', tube);
                 this.selectTube(tube.mesh);
             }
         } else {
-            console.log('🖱️  Clicked empty space');
+            console.log('  Clicked empty space');
             this.deselectTube();
         }
     }
@@ -361,12 +367,12 @@ class TubeJointVisualizer {
     }
 
     restoreState(state) {
-        // Clear existing tubes
+        // clear existing tubes
         this.tubes.forEach(tube => this.scene.remove(tube.mesh));
         this.tubes = [];
         this.deselectTube();
         
-        // Restore tubes from state
+        // restore tubes from state
         state.forEach(tubeData => {
             const tube = new Tube(
                 tubeData.width,
@@ -401,9 +407,16 @@ class TubeJointVisualizer {
     }
 }
 
+
+
+
+// ============================================ 
+// TUBE CLASS 
 // ============================================
-// TUBE CLASS
-// ============================================
+
+
+
+
 class Tube {
     constructor(width, height, thickness, length, viewMode = 'solid') {
         this.width = width;
@@ -424,14 +437,14 @@ class Tube {
         const l = this.length;
         const t = this.thickness;
         
-        // Create 4 walls of the tube
+        // cration of 4 walls of the tube
         const wallMaterial = new THREE.MeshStandardMaterial({
             color: 0x4a9eff,
             metalness: 0.5,
             roughness: 0.5
         });
         
-        // Top wall
+        // top wall
         const topWall = new THREE.Mesh(
             new THREE.BoxGeometry(w, t, l),
             wallMaterial
@@ -439,7 +452,7 @@ class Tube {
         topWall.position.y = (h - t) / 2;
         group.add(topWall);
         
-        // Bottom wall
+        // bottom wall
         const bottomWall = new THREE.Mesh(
             new THREE.BoxGeometry(w, t, l),
             wallMaterial
@@ -447,7 +460,7 @@ class Tube {
         bottomWall.position.y = -(h - t) / 2;
         group.add(bottomWall);
         
-        // Left wall
+        // left wall
         const leftWall = new THREE.Mesh(
             new THREE.BoxGeometry(t, h - 2 * t, l),
             wallMaterial
@@ -455,7 +468,7 @@ class Tube {
         leftWall.position.x = -(w - t) / 2;
         group.add(leftWall);
         
-        // Right wall
+        // right wall
         const rightWall = new THREE.Mesh(
             new THREE.BoxGeometry(t, h - 2 * t, l),
             wallMaterial
@@ -463,7 +476,7 @@ class Tube {
         rightWall.position.x = (w - t) / 2;
         group.add(rightWall);
         
-        // Add wireframe helper
+        // wireframe helper
         const wireframe = new THREE.BoxHelper(group, 0x00ff00);
         wireframe.visible = false;
         wireframe.name = 'wireframe';
@@ -501,9 +514,16 @@ class Tube {
     }
 }
 
+
+
+
 // ============================================
 // HISTORY CLASS (Undo/Redo)
 // ============================================
+
+
+
+
 class History {
     constructor() {
         this.states = [];
@@ -512,10 +532,10 @@ class History {
     }
 
     saveState(state) {
-        // Remove any states after current index
+        // remove any states after current index
         this.states = this.states.slice(0, this.currentIndex + 1);
         
-        // Add new state
+        // new state
         this.states.push(JSON.parse(JSON.stringify(state, this.replacer)));
         
         // Limit history size
@@ -543,7 +563,7 @@ class History {
     }
 
     replacer(key, value) {
-        // Custom serialization for Three.js objects
+        // Custom serialization 
         if (value instanceof THREE.Vector3 || value instanceof THREE.Euler) {
             return { x: value.x, y: value.y, z: value.z, _type: value.constructor.name };
         }
@@ -551,7 +571,7 @@ class History {
     }
 
     reviver(key, value) {
-        // Custom deserialization for Three.js objects
+        // Custom deserialization 
         if (value && value._type === 'Vector3') {
             return new THREE.Vector3(value.x, value.y, value.z);
         }
@@ -562,19 +582,25 @@ class History {
     }
 }
 
+
+
 // ============================================
 // START APPLICATION
 // ============================================
-console.log('✅ app-main.js loaded');
 
-// Initialize immediately since DOM is already loaded when this module loads
-console.log('🎬 Initializing Tube Joint Visualizer...');
+
+
+
+console.log('app-main.js loaded');
+
+// initialize immediately 
+console.log('Initializing Tube Joint Visualizer...');
 try {
     const app = new TubeJointVisualizer();
-    console.log('✅ Tube Joint Visualizer initialized successfully!');
-    window.app = app; // Make accessible for debugging
+    console.log('Tube Joint Visualizer initialized successfully!');
+    window.app = app; //  for debugging
 } catch (error) {
-    console.error('❌ Failed to initialize app:', error);
+    console.error('Failed to initialize app:', error);
     throw error; // Re-throw so the loader can catch it
 }
 
