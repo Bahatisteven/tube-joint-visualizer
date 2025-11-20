@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test TransformControls</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        Click the cube to see TransformControls<br>
+        Camera: 500, 500, 500<br>
+        Cube: 0, 0, 0<br>
+    </div>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./node_modules/three/build/three.module.js",
+            "three/addons/": "./node_modules/three/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { TransformControls } from 'three/addons/controls/TransformControls.js';
+
+        // Scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x222222);
+
+        // Camera - far away to see everything
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+        camera.position.set(500, 500, 500);
+        camera.lookAt(0, 0, 0);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lights
+        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambient);
+        const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+        directional.position.set(100, 200, 100);
+        scene.add(directional);
+
+        // Grid
+        const grid = new THREE.GridHelper(1000, 20);
+        scene.add(grid);
+
+        // Axes
+        const axes = new THREE.AxesHelper(200);
+        scene.add(axes);
+
+        // Orbit Controls
+        const orbitControls = new OrbitControls(camera, renderer.domElement);
+        orbitControls.enableDamping = true;
+        orbitControls.dampingFactor = 0.05;
+
+        // Transform Controls
+        const transformControls = new TransformControls(camera, renderer.domElement);
+        transformControls.addEventListener('dragging-changed', (event) => {
+            orbitControls.enabled = !event.value;
+        });
+        transformControls.setMode('translate');
+        transformControls.setSize(2.0); // VERY LARGE
+        transformControls.setSpace('world');
+        scene.add(transformControls);
+
+        console.log('TransformControls added to scene');
+        console.log('TransformControls visible:', transformControls.visible);
+        console.log('TransformControls children:', transformControls.children.length);
+
+        // Create a BIG cube
+        const geometry = new THREE.BoxGeometry(100, 100, 100);
+        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.set(0, 50, 0);
+        scene.add(cube);
+
+        console.log('Cube position:', cube.position);
+
+        // Raycaster
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Click handler
+        renderer.domElement.addEventListener('click', (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(cube);
+
+            if (intersects.length > 0) {
+                console.log('CUBE CLICKED!');
+                transformControls.attach(cube);
+                transformControls.visible = true;
+                transformControls.enabled = true;
+                cube.material.color.setHex(0xffff00);
+                console.log('TransformControls attached');
+                console.log('TransformControls visible:', transformControls.visible);
+                console.log('TransformControls enabled:', transformControls.enabled);
+                console.log('TransformControls object:', transformControls.object);
+            } else {
+                console.log('Clicked empty space');
+                transformControls.detach();
+                cube.material.color.setHex(0x00ff00);
+            }
+        });
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            orbitControls.update();
+            
+            if (transformControls.visible) {
+                transformControls.updateMatrixWorld();
+            }
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        console.log('Everything initialized!');
+    </script>
+</body>
+</html>

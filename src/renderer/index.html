@@ -83,7 +83,7 @@
                 <h3>Info</h3>
                 <div id="tubeCount">Tubes: 0</div>
                 <div id="jointInfo">Joints: 0</div>
-                <div id="selectedInfo">Selected: None</div>
+                <div id="selectedInfo" style="white-space: pre-line; line-height: 1.4; font-size: 12px;">Selected: None</div>
             </div>
         </div>
 
@@ -93,11 +93,29 @@
             <div class="viewport-overlay">
                 <div class="help-text">
                     <strong>Controls:</strong><br>
+                    <strong>Camera:</strong><br>
                     Left Click + Drag: Rotate view<br>
                     Right Click + Drag: Pan view<br>
                     Mouse Wheel: Zoom<br>
-                    Click Tube: Select<br>
-                    G: Grab/Move selected tube
+                    <br>
+                    <strong>Tubes:</strong><br>
+                    Click Tube: Select (turns yellow)<br>
+                    Drag Tube: Move it<br>
+                    Delete: Remove tube<br>
+                    <br>
+                    <strong>Visual Indicators:</strong><br>
+                    Red Sphere: Joint location<br>
+                    Magenta Line: Connection between tubes<br>
+                    RGB Arrows: Tube orientation (selected only)<br>
+                    - Red=X, Green=Y, Blue=Z<br>
+                    <br>
+                    <strong>Keyboard (select tube first):</strong><br>
+                    Arrow Keys: Move (Shift = 10x faster)<br>
+                    PageUp/+: Move up<br>
+                    PageDown/-: Move down<br>
+                    R/E: Rotate Y axis<br>
+                    Q/W: Rotate X axis<br>
+                    (Hold Shift for 30° rotation)
                 </div>
             </div>
         </div>
