@@ -482,8 +482,9 @@ class TubeJointVisualizer {
         if (tube) {
             this.selectedTube = tube;
             tube.setSelected(true);
-            this.showAxisArrows(tube); // Show RGB arrows on selected tube
-            console.log('✅ Tube selected (yellow) - RGB arrows visible');
+            this.showAxisArrows(tube);
+            this.showBoundingBox(tube);
+            console.log('✅ Tube selected - RGB arrows + bounding box visible');
             this.updateUI();
         }
     }
@@ -491,9 +492,29 @@ class TubeJointVisualizer {
     deselectTube() {
         if (this.selectedTube) {
             this.selectedTube.setSelected(false);
-            this.hideAxisArrows(this.selectedTube); // Hide RGB arrows
+            this.hideAxisArrows(this.selectedTube);
+            this.hideBoundingBox();
             this.selectedTube = null;
             this.updateUI();
+        }
+    }
+
+    showBoundingBox(tube) {
+        this.hideBoundingBox(); // Remove old box if exists
+        
+        // Create a box helper that shows the tube's bounding box
+        this.boundingBoxHelper = new THREE.BoxHelper(tube.mesh, 0xffff00); // Yellow box
+        this.boundingBoxHelper.material.linewidth = 2;
+        this.boundingBoxHelper.material.transparent = true;
+        this.boundingBoxHelper.material.opacity = 0.5;
+        this.scene.add(this.boundingBoxHelper);
+    }
+
+    hideBoundingBox() {
+        if (this.boundingBoxHelper) {
+            this.scene.remove(this.boundingBoxHelper);
+            this.boundingBoxHelper.dispose();
+            this.boundingBoxHelper = null;
         }
     }
 
