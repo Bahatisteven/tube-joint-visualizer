@@ -429,7 +429,10 @@ class TubeJointVisualizer {
             const tube = this.tubes.find(t => t.mesh === clickedMesh.parent || clickedMesh.parent === t.mesh);
             
             if (tube) {
-                this.selectTube(tube.mesh);
+                // Only select if not already selected (prevents color flash)
+                if (this.selectedTube !== tube) {
+                    this.selectTube(tube.mesh);
+                }
                 
                 // Start dragging
                 this.isDragging = true;
