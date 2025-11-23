@@ -4,13 +4,20 @@
   "description": "Tube Joint Visualizer an interactive desktop app for designing rectangular/square tube joints.",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:mac": "electron-builder --mac",
-    "build:linux": "electron-builder --linux"
+    "start": "npm run bundle && electron .",
+    "bundle": "esbuild src/renderer/app-main.js --bundle --outfile=src/renderer/app-bundle.js --format=iife --global-name=TubeApp",
+    "build": "npm run bundle && electron-builder",
+    "build:win": "npm run bundle && electron-builder --win",
+    "build:mac": "npm run bundle && electron-builder --mac",
+    "build:linux": "npm run bundle && electron-builder --linux"
   },
-  "keywords": ["3d", "visualization", "tube", "joint", "cad"],
+  "keywords": [
+    "3d",
+    "visualization",
+    "tube",
+    "joint",
+    "cad"
+  ],
   "build": {
     "appId": "com.tubejoint.visualizer",
     "productName": "Tube Joint Visualizer",
@@ -22,14 +29,23 @@
       "assets/**/*",
       "node_modules/**/*"
     ],
+    "asarUnpack": [
+      "node_modules/three/**/*"
+    ],
     "win": {
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "mac": {
-      "target": ["dmg"]
+      "target": [
+        "dmg"
+      ]
     },
     "linux": {
-      "target": ["AppImage"]
+      "target": [
+        "AppImage"
+      ]
     }
   },
   "author": "",
@@ -39,6 +55,7 @@
   },
   "devDependencies": {
     "electron": "^33.2.1",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.27.0"
   }
 }
