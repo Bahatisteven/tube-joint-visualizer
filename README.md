@@ -140,10 +140,17 @@ tube-joint-visualizer/
 │       ├── app-bundle.js    # Bundled JavaScript (auto-generated)
 │       ├── index.html       # Interface layout
 │       └── styles.css       # Styling
-├── dist/                    # Built executables
-├── node_modules/            # Dependencies
+├── docs/
+│   └── screenshots/         # Application screenshots
+│       ├── main-interface.png
+│       ├── joint-detection.png
+│       └── wireframe-mode.png
+├── dist/                    # Built executables (git-ignored)
+├── node_modules/            # Dependencies (git-ignored)
 ├── package.json             # Project configuration
-├── PROGRESS.md              # Development notes
+├── package-lock.json        # Dependency lock file
+├── .gitignore               # Git ignore rules
+├── LICENSE                  # ISC License
 └── README.md                # This file
 ```
 
