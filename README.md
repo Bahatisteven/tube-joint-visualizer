@@ -1,6 +1,6 @@
-# 🔧 Tube Joint Visualizer
+# Tube Joint Visualizer
 
-An interactive 3D desktop application for designing and visualizing rectangular/square tube joints with real-time angle detection and joint preview.
+A 3D desktop application for designing and visualizing rectangular tube joints with real-time angle detection.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-ISC-green.svg)
@@ -9,288 +9,195 @@ An interactive 3D desktop application for designing and visualizing rectangular/
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Controls](#controls)
-- [Building](#building)
-- [Project Structure](#project-structure)
-- [Requirements](#requirements)
-- [License](#license)
-
----
-
-## ✨ Features
+## Features
 
 ### Core Functionality
-- ✅ **Create Tubes** - Design rectangular and square hollow tubes with custom dimensions
-- ✅ **Interactive Dragging** - Click and drag tubes in 3D space with mouse
-- ✅ **Keyboard Movement** - Precise positioning with arrow keys (1 or 10 unit steps)
-- ✅ **Tube Rotation** - Rotate tubes on X and Y axes with keyboard shortcuts
-- ✅ **Visual Joint Detection** - Automatic detection when tubes get close (<100mm)
-- ✅ **Joint Markers** - Red spheres and magenta lines highlight joint locations
-- ✅ **Angle Display** - Real-time angle calculation (0°, 45°, 90°, 135°, 180°)
-- ✅ **Multiple Tubes** - Build complex assemblies with multiple tubes
-- ✅ **Selection Highlight** - Yellow color and bounding box for selected tubes
-- ✅ **Undo/Redo** - Full history system (50 states)
-- ✅ **View Modes** - Toggle between solid and wireframe display
-- ✅ **Delete Tubes** - Remove selected tubes with Delete key
+- Create rectangular and square hollow tubes with custom dimensions
+- Drag tubes directly in 3D space with your mouse
+- Use arrow keys for precise positioning (1mm or 10mm steps)
+- Rotate tubes on different axes using keyboard shortcuts
+- Automatic joint detection when tubes are within 100mm of each other
+- Visual joint markers with red spheres and magenta connection lines
+- Real-time angle calculation between tubes (0°, 45°, 90°, 135°, 180°)
+- Build assemblies with multiple tubes
+- Yellow highlighting and bounding box for selected tubes
+- Full undo/redo history (up to 50 states)
+- Switch between solid and wireframe view modes
+- Delete tubes with the Delete key
 
-### User Interface
-- 🎨 Professional dark theme
-- 📊 Real-time info panel (tube count, joints, selected tube details)
-- 🎮 Intuitive mouse and keyboard controls
-- 📐 Dimension display with position and rotation
-- 🔍 Zoom, pan, and rotate camera with OrbitControls
+### Interface
+- Dark theme interface
+- Real-time info panel showing tube count, joints, and dimensions
+- Mouse and keyboard controls that feel natural
+- Position and rotation data for selected tubes
+- Zoom, pan, and rotate the camera to inspect from any angle
 
 ---
 
-## 💻 Installation
+## Installation
 
-### Prerequisites
-- **Node.js** (v16 or higher)
-- **npm** (comes with Node.js)
+You'll need Node.js (v16 or higher) installed on your computer.
 
-### Steps
-
-1. **Clone the repository**
+1. Clone this repository:
    ```bash
    git clone <repository-url>
    cd tube-joint-visualizer
    ```
 
-2. **Install dependencies**
+2. Install the dependencies:
    ```bash
    npm install
    ```
 
-3. **Run the application**
+3. Run the app:
    ```bash
    npm start
    ```
 
 ---
 
-## 🚀 Usage
+## How to Use
 
-### Creating Tubes
+### Creating and Moving Tubes
 
-1. **Set dimensions** in the control panel:
-   - Width (mm)
-   - Height (mm)
-   - Thickness (wall thickness in mm)
-   - Length (mm)
+1. Set your tube dimensions in the left panel (width, height, thickness, length)
+2. Click "Add Tube" to create it
+3. Click on any tube to select it (it turns yellow)
+4. Drag the selected tube with your mouse, or use arrow keys to move it precisely
+5. Use PageUp/PageDown to move tubes up or down
+6. Rotate tubes with Q/W/E/R keys (hold Shift for larger rotations)
 
-2. **Click "Add Tube"** to create a new tube in the scene
+### Working with Joints
 
-3. **Select a tube** by clicking on it (turns yellow with bounding box)
+When you move tubes close together (within 100mm), the app automatically detects potential joints. You'll see:
+- A red sphere marking where the joint would be
+- A magenta line connecting the two tubes
+- The angle between them shown in the info panel
 
-4. **Move the tube** by:
-   - **Dragging** with the mouse
-   - **Arrow keys** for precise movement
-   - **PageUp/PageDown** for vertical movement
-
-5. **Rotate the tube** using keyboard shortcuts (see Controls below)
-
-### Joint Detection
-
-- When tubes are **within 100mm** of each other, joints are automatically detected
-- **Red spheres** appear at joint midpoints
-- **Magenta lines** connect the tubes
-- **Joint angles** are displayed in the info panel (e.g., "Joints: 2 [90°, 45°]")
-
-### View Controls
-
-- **Toggle Wireframe** - Switch between solid and wireframe views
-- **Orbit Controls** - Right-click drag to pan, left-click drag to rotate camera
-- **Zoom** - Mouse wheel to zoom in/out
+This makes it easy to plan how tubes will connect before actually cutting or welding them.
 
 ---
 
-## 🎮 Controls
+## Controls
 
-### Mouse Controls
-| Action | Control |
-|--------|---------|
-| Select tube | Left-click on tube |
-| Drag selected tube | Left-click + drag on selected tube |
-| Rotate camera | Left-click + drag on **empty space** |
-| Pan camera | Right-click + drag |
-| Zoom | Mouse wheel scroll |
+### Mouse
+| Action | How to do it |
+|--------|-------------|
+| Select a tube | Click on it |
+| Move selected tube | Click and drag it |
+| Rotate camera view | Click and drag on empty space |
+| Pan camera | Right-click and drag |
+| Zoom in/out | Scroll with mouse wheel |
 
-### Keyboard Controls
-| Key | Action |
-|-----|--------|
-| **↑** Arrow Up | Move tube backward (1 unit) |
-| **↓** Arrow Down | Move tube forward (1 unit) |
-| **←** Arrow Left | Move tube left (1 unit) |
-| **→** Arrow Right | Move tube right (1 unit) |
-| **Shift + Arrows** | Move tube 10 units (fast movement) |
-| **PageUp / +** | Move tube up vertically |
-| **PageDown / -** | Move tube down vertically |
-| **R** | Rotate tube on Y-axis +15° |
-| **E** | Rotate tube on Y-axis -15° |
-| **Q** | Rotate tube on X-axis +15° |
-| **W** | Rotate tube on X-axis -15° |
-| **Shift + R/E/Q/W** | Rotate 30° (instead of 15°) |
-| **Delete / Backspace** | Delete selected tube |
+### Keyboard
+| Key | What it does |
+|-----|-------------|
+| Arrow keys | Move tube 1mm in that direction |
+| Shift + Arrows | Move tube 10mm (faster) |
+| PageUp or + | Move tube up |
+| PageDown or - | Move tube down |
+| R | Rotate around Y-axis +15° |
+| E | Rotate around Y-axis -15° |
+| Q | Rotate around X-axis +15° |
+| W | Rotate around X-axis -15° |
+| Shift + R/E/Q/W | Rotate 30° instead of 15° |
+| Delete or Backspace | Remove selected tube |
 
-> **Note:** Keyboard controls require a tube to be selected first (click on it).
-
-### UI Controls
-- **Add Tube** - Create a new tube with current dimensions
-- **Delete Tube** - Remove the selected tube (or use Delete/Backspace key)
-- **Toggle Wireframe** - Switch between solid and wireframe mode
-- **Undo / Redo** - Navigate through edit history (buttons only)
+**Note:** Select a tube first by clicking on it before using keyboard controls.
 
 ---
 
-## 🔨 Building
+## Building the App
 
-### Build for All Platforms
+To create a standalone executable that you can share or run without Node.js:
+
 ```bash
 npm run build
 ```
 
-### Build for Specific Platform
-```bash
-# Windows
-npm run build:win
-
-# macOS
-npm run build:mac
-
-# Linux
-npm run build:linux
-```
-
-### Output
-Built executables will be in the `dist/` directory:
+This creates an executable in the `dist/` folder:
+- **Linux**: `.AppImage` file (107MB)
 - **Windows**: `.exe` installer
 - **macOS**: `.dmg` disk image
-- **Linux**: `.AppImage`
+
+You can also build for a specific platform:
+```bash
+npm run build:win    # Windows
+npm run build:mac    # macOS  
+npm run build:linux  # Linux
+```
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 tube-joint-visualizer/
 ├── src/
 │   ├── main.js              # Electron main process
 │   └── renderer/
-│       ├── app-main.js      # Core application logic (Three.js)
-│       ├── app-loader.js    # App initialization loader
-│       ├── index.html       # Main HTML interface
-│       └── styles.css       # Application styles
-├── assets/                  # Application assets (icons, images)
-├── dist/                    # Built executables (after build)
-├── docs/                    # Documentation files
+│       ├── app-main.js      # Main application code
+│       ├── app-bundle.js    # Bundled JavaScript (auto-generated)
+│       ├── index.html       # Interface layout
+│       └── styles.css       # Styling
+├── dist/                    # Built executables
 ├── node_modules/            # Dependencies
 ├── package.json             # Project configuration
-├── package-lock.json        # Dependency lock file
-├── PROGRESS.md              # Development progress notes
-├── LICENSE                  # License file
-└── README.md               # This file
+├── PROGRESS.md              # Development notes
+└── README.md                # This file
 ```
 
 ---
 
-## 📦 Requirements
+## Requirements
 
-### System Requirements
-- **OS**: Windows 10+, macOS 10.13+, or Linux (Ubuntu 18.04+)
-- **RAM**: 4GB minimum (8GB recommended)
-- **Graphics**: WebGL-compatible GPU
-
-### Node.js Dependencies
-- **Electron**: ^33.2.1 (Desktop framework)
-- **Three.js**: ^0.181.1 (3D graphics library)
-- **electron-builder**: ^25.1.8 (Build tool)
+- **Operating System**: Windows 10+, macOS 10.13+, or Linux (Ubuntu 18.04+)
+- **Memory**: 4GB RAM minimum, 8GB recommended
+- **Graphics**: Any GPU with WebGL support
 
 ---
 
-## 📖 Technical Details
+## Technical Details
 
-### Technologies Used
-- **Electron**: Cross-platform desktop application framework
-- **Three.js**: 3D graphics rendering engine
-- **WebGL**: Hardware-accelerated graphics
-- **JavaScript ES6+**: Modern JavaScript features
+Built with:
+- **Electron** for the desktop app framework
+- **Three.js** for 3D graphics rendering
+- **esbuild** for bundling JavaScript modules
 
-### Key Classes
-- **TubeJointApp**: Main application controller
-- **Tube**: Tube geometry and rendering
-- **History**: Undo/redo state management
-- **Joint Detection**: Proximity and angle calculation
-
-### Joint Detection Algorithm
-- Detects tubes within 100mm proximity
-- Calculates angles using vector dot product
-- Snaps to standard angles (0°, 45°, 90°, 135°, 180°)
-- Visual markers (spheres + lines) for joint preview
+The joint detection algorithm works by calculating the distance between tube centers and finding the angle using vector mathematics. When tubes are close enough, it snaps angles to standard values (0°, 45°, 90°, etc.) for easier reference.
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### App won't start
+**App won't start?**
 ```bash
-# Clear node_modules and reinstall
 rm -rf node_modules package-lock.json
 npm install
 npm start
 ```
 
-### Build fails
+**Build failing?**
 ```bash
-# Make sure electron-builder is installed
 npm install --save-dev electron-builder
 npm run build
 ```
 
-### Graphics issues
+**Graphics look weird?**
 - Update your graphics drivers
-- Ensure WebGL is enabled in your browser/Electron
-- Check GPU compatibility with Three.js
+- Make sure your system supports WebGL
+- Try toggling between solid and wireframe modes
 
 ---
 
-## 📝 License
+## License
 
-ISC License - See [LICENSE](LICENSE) file for details
-
----
-
-## 👤 Author
-
-Developed as part of a coding challenge project.
+ISC License - See LICENSE file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Screenshots
 
-- **Three.js** community for excellent 3D library
-- **Electron** team for desktop framework
-- Coding challenge organizers
+*Screenshots will be added here showing the app in action*
 
 ---
-
-## 📸 Screenshots
-
-*(Add screenshots here after taking them)*
-
-### Main Interface
-![Main Interface](docs/screenshots/main-interface.png)
-
-### Joint Detection
-![Joint Detection](docs/screenshots/joint-detection.png)
-
-### Wireframe Mode
-![Wireframe Mode](docs/screenshots/wireframe-mode.png)
-
----
-
-**Made with ❤️ using Electron and Three.js**
