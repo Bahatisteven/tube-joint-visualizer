@@ -2,14 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
-
-// ============================================
-// MAIN APPLICATION CLASS
-// ============================================
-
-
-
-
+// Main app class for the tube visualizer
 class TubeJointVisualizer {
     constructor() {
         this.scene = null;
@@ -22,15 +15,15 @@ class TubeJointVisualizer {
         this.joints = [];
         this.jointMarkers = [];
         this.axisHelpers = [];
-        this.boundingBoxHelper = null; // Store bounding box for selected tube
+        this.boundingBoxHelper = null;
         
-        // Custom drag system
+        // drag stuff
         this.isDragging = false;
         this.dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
         this.dragOffset = new THREE.Vector3();
         this.dragIntersection = new THREE.Vector3();
         
-        this.viewMode = 'solid';
+        this.viewMode = "solid";
         this.history = new History();
         
         this.init();
@@ -39,333 +32,262 @@ class TubeJointVisualizer {
     }
 
     init() {
-        console.log('Initializing 3D scene...');
-        
-        // Create Scene
+        // setup the 3D scene
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x0a0a0a);
-        console.log('  ✓ Scene created');
 
-        // Create Camera
-        this.camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            10000
-        );
+        // camera setup
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
         this.camera.position.set(400, 400, 400);
         this.camera.lookAt(0, 0, 0);
-        console.log('  ✓ Camera created at position:', this.camera.position);
 
-        // create Renderer
-        const container = document.getElementById('canvas-container');
+        // renderer
+        const container = document.getElementById("canvas-container");
         if (!container) {
-            throw new Error('Canvas container not found!');
+            throw new Error("Canvas container not found!");
         }
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        container.innerHTML = ''; // Clear loading message
+        container.innerHTML = "";
         container.appendChild(this.renderer.domElement);
-        console.log('  ✓ Renderer created and attached');
 
-        // add Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        this.scene.add(ambientLight);
+        // lights
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(100, 200, 100);
-        this.scene.add(directionalLight);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight1.position.set(100, 200, 100);
+        this.scene.add(dirLight1);
 
-        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
-        directionalLight2.position.set(-100, -100, -100);
-        this.scene.add(directionalLight2);
-        console.log('  ✓ Lights added');
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+        dirLight2.position.set(-100, -100, -100);
+        this.scene.add(dirLight2);
 
-        // add Grid Helper - Enhanced for better visibility
-        const gridHelper = new THREE.GridHelper(2000, 40, 0x888888, 0x444444);
-        this.scene.add(gridHelper);
+        // grid and floor
+        const grid = new THREE.GridHelper(2000, 40, 0x888888, 0x444444);
+        this.scene.add(grid);
         
-        // Add a subtle floor plane for depth perception
-        const floorGeometry = new THREE.PlaneGeometry(2000, 2000);
-        const floorMaterial = new THREE.MeshBasicMaterial({ 
+        const floorGeo = new THREE.PlaneGeometry(2000, 2000);
+        const floorMat = new THREE.MeshBasicMaterial({ 
             color: 0x1a1a1a, 
             side: THREE.DoubleSide,
             transparent: true,
             opacity: 0.3
         });
-        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         floor.position.y = -0.1;
         this.scene.add(floor);
 
-        // add Axes Helper
-        const axesHelper = new THREE.AxesHelper(150);
-        this.scene.add(axesHelper);
-        console.log('  ✓ Grid and axes added');
+        // axes
+        const axes = new THREE.AxesHelper(150);
+        this.scene.add(axes);
 
-        // setup Orbit Controls (camera rotation/zoom)
+        // orbit controls for camera
         this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
         this.orbitControls.enableDamping = true;
         this.orbitControls.dampingFactor = 0.05;
-        console.log('  ✓ OrbitControls initialized');
 
-        // raycaster for mouse picking and dragging
+        // raycaster for clicking
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-        console.log('  ✓ Raycaster initialized');
 
-        // handle window resize
-        window.addEventListener('resize', () => this.onWindowResize());
-        
-        console.log('3D scene initialization complete!');
+        window.addEventListener("resize", () => this.onWindowResize());
     }
 
     setupEventListeners() {
-        console.log('Setting up event listeners...');
-        
-        // tube type change
+        // tube type radio buttons
         document.querySelectorAll('input[name="tubeType"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const heightGroup = document.getElementById('heightGroup');
-                if (e.target.value === 'square') {
-                    heightGroup.style.display = 'none';
-                    document.getElementById('height').value = document.getElementById('width').value;
+            radio.addEventListener("change", (e) => {
+                const heightGroup = document.getElementById("heightGroup");
+                if (e.target.value === "square") {
+                    heightGroup.style.display = "none";
+                    document.getElementById("height").value = document.getElementById("width").value;
                 } else {
-                    heightGroup.style.display = 'flex';
+                    heightGroup.style.display = "flex";
                 }
             });
         });
 
-        // width change for square mode
-        document.getElementById('width').addEventListener('input', (e) => {
+        // sync width/height for square tubes
+        document.getElementById("width").addEventListener("input", (e) => {
             const tubeType = document.querySelector('input[name="tubeType"]:checked').value;
-            if (tubeType === 'square') {
-                document.getElementById('height').value = e.target.value;
+            if (tubeType === "square") {
+                document.getElementById("height").value = e.target.value;
             }
         });
 
-        // add Tube button
-        document.getElementById('addTube').addEventListener('click', () => {
-            console.log('Add Tube button clicked');
+        // buttons
+        document.getElementById("addTube").addEventListener("click", () => {
             this.addTube();
         });
 
-        // delete Tube button
-        document.getElementById('deleteTube').addEventListener('click', () => {
-            console.log('Delete Tube button clicked');
+        document.getElementById("deleteTube").addEventListener("click", () => {
             this.deleteTube();
         });
 
-        // view mode change
+        // view mode toggle
         document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                console.log('View mode changed to:', e.target.value);
+            radio.addEventListener("change", (e) => {
                 this.viewMode = e.target.value;
                 this.updateViewMode();
             });
         });
 
-        // Undo/Redo
-        document.getElementById('undo').addEventListener('click', () => {
-            console.log('↶ Undo clicked');
+        // undo/redo buttons
+        document.getElementById("undo").addEventListener("click", () => {
             this.undo();
         });
-        document.getElementById('redo').addEventListener('click', () => {
-            console.log('↷ Redo clicked');
+        document.getElementById("redo").addEventListener("click", () => {
             this.redo();
         });
 
-        // mouse events for drag
-        this.renderer.domElement.addEventListener('mousedown', (event) => this.onMouseDown(event));
-        this.renderer.domElement.addEventListener('mousemove', (event) => this.onMouseMove(event));
-        this.renderer.domElement.addEventListener('mouseup', (event) => this.onMouseUp(event));
+        // mouse stuff for dragging
+        this.renderer.domElement.addEventListener("mousedown", (e) => this.handleMouseDown(e));
+        this.renderer.domElement.addEventListener("mousemove", (e) => this.handleMouseMove(e));
+        this.renderer.domElement.addEventListener("mouseup", (e) => this.handleMouseUp(e));
 
-        // keyboard shortcuts
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Delete' || event.key === 'Backspace') {
+        // keyboard controls
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Delete" || event.key === "Backspace") {
                 this.deleteTube();
                 return;
             }
             
             if (!this.selectedTube) return;
             
-            const moveSpeed = event.shiftKey ? 10 : 1; // 10 units if Shift, 1 unit otherwise
-            let moved = false;
+            const speed = event.shiftKey ? 10 : 1;
+            let didMove = false;
             
             switch(event.key) {
-                case 'ArrowUp':
-                    this.selectedTube.mesh.position.z -= moveSpeed;
-                    moved = true;
-                    console.log(`⬆️ Moved tube forward ${moveSpeed} units`);
+                case "ArrowUp":
+                    this.selectedTube.mesh.position.z -= speed;
+                    didMove = true;
                     break;
-                case 'ArrowDown':
-                    this.selectedTube.mesh.position.z += moveSpeed;
-                    moved = true;
-                    console.log(`⬇️ Moved tube backward ${moveSpeed} units`);
+                case "ArrowDown":
+                    this.selectedTube.mesh.position.z += speed;
+                    didMove = true;
                     break;
-                case 'ArrowLeft':
-                    this.selectedTube.mesh.position.x -= moveSpeed;
-                    moved = true;
-                    console.log(`⬅️ Moved tube left ${moveSpeed} units`);
+                case "ArrowLeft":
+                    this.selectedTube.mesh.position.x -= speed;
+                    didMove = true;
                     break;
-                case 'ArrowRight':
-                    this.selectedTube.mesh.position.x += moveSpeed;
-                    moved = true;
-                    console.log(`➡️ Moved tube right ${moveSpeed} units`);
+                case "ArrowRight":
+                    this.selectedTube.mesh.position.x += speed;
+                    didMove = true;
                     break;
-                case 'PageUp':
-                case '+':
-                case '=':
-                    this.selectedTube.mesh.position.y += moveSpeed;
-                    moved = true;
-                    console.log(`⬆️ Moved tube up ${moveSpeed} units`);
+                case "PageUp":
+                case "+":
+                case "=":
+                    this.selectedTube.mesh.position.y += speed;
+                    didMove = true;
                     break;
-                case 'PageDown':
-                case '-':
-                case '_':
-                    this.selectedTube.mesh.position.y -= moveSpeed;
-                    moved = true;
-                    console.log(`⬇️ Moved tube down ${moveSpeed} units`);
+                case "PageDown":
+                case "-":
+                case "_":
+                    this.selectedTube.mesh.position.y -= speed;
+                    didMove = true;
                     break;
-                case 'r':
-                case 'R':
-                    // Rotate around Y axis
-                    const rotateSpeed = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12); // 30° or 15°
-                    this.selectedTube.mesh.rotation.y += rotateSpeed;
-                    moved = true;
-                    const degrees = (rotateSpeed * 180 / Math.PI).toFixed(0);
-                    console.log(`🔄 Rotated tube ${degrees}° around Y axis`);
+                case "r":
+                case "R":
+                    const rotSpeed = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
+                    this.selectedTube.mesh.rotation.y += rotSpeed;
+                    didMove = true;
                     break;
-                case 'e':
-                case 'E':
-                    // Rotate around Y axis (opposite direction)
-                    const rotateSpeedE = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
-                    this.selectedTube.mesh.rotation.y -= rotateSpeedE;
-                    moved = true;
-                    const degreesE = (rotateSpeedE * 180 / Math.PI).toFixed(0);
-                    console.log(`🔄 Rotated tube -${degreesE}° around Y axis`);
+                case "e":
+                case "E":
+                    const rotSpeedE = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
+                    this.selectedTube.mesh.rotation.y -= rotSpeedE;
+                    didMove = true;
                     break;
-                case 'q':
-                case 'Q':
-                    // Rotate around X axis
-                    const rotateSpeedQ = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
-                    this.selectedTube.mesh.rotation.x += rotateSpeedQ;
-                    moved = true;
-                    const degreesQ = (rotateSpeedQ * 180 / Math.PI).toFixed(0);
-                    console.log(`🔄 Rotated tube ${degreesQ}° around X axis`);
+                case "q":
+                case "Q":
+                    const rotSpeedQ = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
+                    this.selectedTube.mesh.rotation.x += rotSpeedQ;
+                    didMove = true;
                     break;
-                case 'w':
-                case 'W':
-                    // Rotate around X axis (opposite)
-                    const rotateSpeedW = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
-                    this.selectedTube.mesh.rotation.x -= rotateSpeedW;
-                    moved = true;
-                    const degreesW = (rotateSpeedW * 180 / Math.PI).toFixed(0);
-                    console.log(`🔄 Rotated tube -${degreesW}° around X axis`);
+                case "w":
+                case "W":
+                    const rotSpeedW = event.shiftKey ? (Math.PI / 6) : (Math.PI / 12);
+                    this.selectedTube.mesh.rotation.x -= rotSpeedW;
+                    didMove = true;
                     break;
             }
             
-            if (moved) {
+            if (didMove) {
                 event.preventDefault();
                 this.detectJoints();
                 this.saveState();
             }
         });
-        
-        console.log('  ✓ Event listeners setup complete');
     }
 
     addTube() {
-        const width = parseFloat(document.getElementById('width').value);
-        const height = parseFloat(document.getElementById('height').value);
-        const thickness = parseFloat(document.getElementById('thickness').value);
-        const length = parseFloat(document.getElementById('length').value);
+        const w = parseFloat(document.getElementById("width").value);
+        const h = parseFloat(document.getElementById("height").value);
+        const t = parseFloat(document.getElementById("thickness").value);
+        const len = parseFloat(document.getElementById("length").value);
 
-        const tube = new Tube(width, height, thickness, length, this.viewMode);
+        const tube = new Tube(w, h, t, len, this.viewMode);
         
-        // Position new tubes offset from origin
+        // offset each new tube so they don't overlap
         const offset = this.tubes.length * 80;
         tube.mesh.position.set(offset, 0, offset);
         
         this.tubes.push(tube);
         this.scene.add(tube.mesh);
         
-        // Add axis arrows to the tube
         this.addAxisArrows(tube);
-        
         this.updateUI();
         this.saveState();
-        
-        console.log(`✅ Tube added: ${width}x${height}x${thickness}mm, length: ${length}mm`);
     }
 
     deleteTube() {
         if (this.selectedTube) {
-            const index = this.tubes.indexOf(this.selectedTube);
-            if (index > -1) {
+            const idx = this.tubes.indexOf(this.selectedTube);
+            if (idx > -1) {
                 this.scene.remove(this.selectedTube.mesh);
-                this.tubes.splice(index, 1);
-                
-                // Remove axis arrows for this tube
+                this.tubes.splice(idx, 1);
                 this.removeAxisArrows(this.selectedTube);
-                
                 this.selectedTube = null;
                 this.updateUI();
                 this.saveState();
-                console.log('✅ Tube deleted');
             }
         }
     }
 
     addAxisArrows(tube) {
-        const arrowLength = 100; // Longer arrows for better visibility
-        const arrowColor = {
-            x: 0xff0000, // Red for X-axis
-            y: 0x00ff00, // Green for Y-axis
-            z: 0x0000ff  // Blue for Z-axis
-        };
+        const len = 100;
         
-        // Create arrow helpers
         const xArrow = new THREE.ArrowHelper(
-            new THREE.Vector3(1, 0, 0), // Direction
-            new THREE.Vector3(0, 0, 0), // Origin
-            arrowLength,
-            arrowColor.x,
-            25, // Head length
-            12  // Head width
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            len, 0xff0000, 25, 12
         );
-        xArrow.name = 'xAxisArrow';
-        xArrow.visible = false; // Hidden by default
+        xArrow.name = "xAxisArrow";
+        xArrow.visible = false;
         
         const yArrow = new THREE.ArrowHelper(
             new THREE.Vector3(0, 1, 0),
             new THREE.Vector3(0, 0, 0),
-            arrowLength,
-            arrowColor.y,
-            25,
-            12
+            len, 0x00ff00, 25, 12
         );
-        yArrow.name = 'yAxisArrow';
-        yArrow.visible = false; // Hidden by default
+        yArrow.name = "yAxisArrow";
+        yArrow.visible = false;
         
         const zArrow = new THREE.ArrowHelper(
             new THREE.Vector3(0, 0, 1),
             new THREE.Vector3(0, 0, 0),
-            arrowLength,
-            arrowColor.z,
-            25,
-            12
+            len, 0x0000ff, 25, 12
         );
-        zArrow.name = 'zAxisArrow';
-        zArrow.visible = false; // Hidden by default
+        zArrow.name = "zAxisArrow";
+        zArrow.visible = false;
         
-        // Add arrows to tube mesh (they'll follow the tube's transformations)
         tube.mesh.add(xArrow);
         tube.mesh.add(yArrow);
         tube.mesh.add(zArrow);
         
-        // Store reference
         this.axisHelpers.push({
             tube: tube,
             arrows: [xArrow, yArrow, zArrow]
@@ -373,36 +295,32 @@ class TubeJointVisualizer {
     }
 
     removeAxisArrows(tube) {
-        const index = this.axisHelpers.findIndex(h => h.tube === tube);
-        if (index > -1) {
-            const helper = this.axisHelpers[index];
+        const idx = this.axisHelpers.findIndex(h => h.tube === tube);
+        if (idx > -1) {
+            const helper = this.axisHelpers[idx];
             helper.arrows.forEach(arrow => {
                 tube.mesh.remove(arrow);
                 arrow.dispose();
             });
-            this.axisHelpers.splice(index, 1);
+            this.axisHelpers.splice(idx, 1);
         }
     }
 
     showAxisArrows(tube) {
         const helper = this.axisHelpers.find(h => h.tube === tube);
         if (helper) {
-            helper.arrows.forEach(arrow => {
-                arrow.visible = true;
-            });
+            helper.arrows.forEach(a => a.visible = true);
         }
     }
 
     hideAxisArrows(tube) {
         const helper = this.axisHelpers.find(h => h.tube === tube);
         if (helper) {
-            helper.arrows.forEach(arrow => {
-                arrow.visible = false;
-            });
+            helper.arrows.forEach(a => a.visible = false);
         }
     }
 
-    onMouseDown(event) {
+    handleMouseDown(event) {
         event.preventDefault();
         
         const rect = this.renderer.domElement.getBoundingClientRect();
@@ -411,48 +329,40 @@ class TubeJointVisualizer {
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
         
-        // Get all meshes from all tube groups
-        const allMeshes = [];
+        // collect all meshes
+        const meshes = [];
         this.tubes.forEach(tube => {
             tube.mesh.traverse((child) => {
                 if (child.isMesh) {
-                    allMeshes.push(child);
+                    meshes.push(child);
                 }
             });
         });
         
-        const intersects = this.raycaster.intersectObjects(allMeshes);
+        const hits = this.raycaster.intersectObjects(meshes);
 
-        if (intersects.length > 0) {
-            // Find which tube this mesh belongs to
-            const clickedMesh = intersects[0].object;
+        if (hits.length > 0) {
+            const clickedMesh = hits[0].object;
             const tube = this.tubes.find(t => t.mesh === clickedMesh.parent || clickedMesh.parent === t.mesh);
             
             if (tube) {
-                // Only select if not already selected (prevents color flash)
                 if (this.selectedTube !== tube) {
                     this.selectTube(tube.mesh);
                 }
                 
-                // Start dragging
                 this.isDragging = true;
                 this.orbitControls.enabled = false;
-                
-                // Setup drag plane at tube's Y position
                 this.dragPlane.constant = -tube.mesh.position.y;
                 
-                // Calculate offset from tube center to click point
                 this.raycaster.ray.intersectPlane(this.dragPlane, this.dragOffset);
                 this.dragOffset.sub(tube.mesh.position);
-                
-                console.log('🎯 Started dragging tube');
             }
         } else {
             this.deselectTube();
         }
     }
 
-    onMouseMove(event) {
+    handleMouseMove(event) {
         if (!this.isDragging || !this.selectedTube) return;
         
         event.preventDefault();
@@ -469,12 +379,11 @@ class TubeJointVisualizer {
         }
     }
 
-    onMouseUp(event) {
+    handleMouseUp(event) {
         if (this.isDragging) {
             this.isDragging = false;
             this.orbitControls.enabled = true;
             this.saveState();
-            console.log('✅ Finished dragging - state saved');
         }
     }
 
@@ -487,7 +396,6 @@ class TubeJointVisualizer {
             tube.setSelected(true);
             this.showAxisArrows(tube);
             this.showBoundingBox(tube);
-            console.log('✅ Tube selected - RGB arrows + bounding box visible');
             this.updateUI();
         }
     }
@@ -731,15 +639,9 @@ Rotation: (${(rot.x * 180 / Math.PI).toFixed(0)}°, ${(rot.y * 180 / Math.PI).to
 
 
 
-// ============================================ 
-// TUBE CLASS 
-// ============================================
-
-
-
-
+// Tube class - represents one rectangular tube
 class Tube {
-    constructor(width, height, thickness, length, viewMode = 'solid') {
+    constructor(width, height, thickness, length, viewMode = "solid") {
         this.width = width;
         this.height = height;
         this.thickness = thickness;
@@ -750,56 +652,55 @@ class Tube {
     }
 
     createMesh() {
-        // Create hollow rectangular tube using box geometries
         const group = new THREE.Group();
-        group.name = 'TubeGroup';
+        group.name = "TubeGroup";
         
         const w = this.width;
         const h = this.height;
         const l = this.length;
         const t = this.thickness;
         
-        // cration of 4 walls of the tube
-        const wallMaterial = new THREE.MeshStandardMaterial({
+        // create 4 walls
+        const wallMat = new THREE.MeshStandardMaterial({
             color: 0x4a9eff,
             metalness: 0.5,
             roughness: 0.5
         });
         
-        // top wall
+        // top
         const topWall = new THREE.Mesh(
             new THREE.BoxGeometry(w, t, l),
-            wallMaterial
+            wallMat
         );
         topWall.position.y = (h - t) / 2;
         group.add(topWall);
         
-        // bottom wall
+        // bottom
         const bottomWall = new THREE.Mesh(
             new THREE.BoxGeometry(w, t, l),
-            wallMaterial
+            wallMat
         );
         bottomWall.position.y = -(h - t) / 2;
         group.add(bottomWall);
         
-        // left wall
+        // left
         const leftWall = new THREE.Mesh(
             new THREE.BoxGeometry(t, h - 2 * t, l),
-            wallMaterial
+            wallMat
         );
         leftWall.position.x = -(w - t) / 2;
         group.add(leftWall);
         
-        // right wall
+        // right
         const rightWall = new THREE.Mesh(
             new THREE.BoxGeometry(t, h - 2 * t, l),
-            wallMaterial
+            wallMat
         );
         rightWall.position.x = (w - t) / 2;
         group.add(rightWall);
         
-        // Add an invisible box for easier selection and TransformControls attachment
-        const boundingBox = new THREE.Mesh(
+        // invisible bounding box for selection
+        const bbox = new THREE.Mesh(
             new THREE.BoxGeometry(w, h, l),
             new THREE.MeshBasicMaterial({ 
                 transparent: true, 
@@ -807,13 +708,12 @@ class Tube {
                 visible: false
             })
         );
-        boundingBox.name = 'boundingBox';
-        group.add(boundingBox);
+        bbox.name = "boundingBox";
+        group.add(bbox);
         
-        // wireframe helper
         const wireframe = new THREE.BoxHelper(group, 0x00ff00);
         wireframe.visible = false;
-        wireframe.name = 'wireframe';
+        wireframe.name = "wireframe";
         group.add(wireframe);
         
         return group;
@@ -821,43 +721,31 @@ class Tube {
 
     setViewMode(mode) {
         this.viewMode = mode;
-        const wireframe = this.mesh.getObjectByName('wireframe');
+        const wireframe = this.mesh.getObjectByName("wireframe");
         
         this.mesh.children.forEach(child => {
-            if (child.type === 'Mesh') {
-                if (mode === 'wireframe') {
-                    child.material.wireframe = true;
-                } else {
-                    child.material.wireframe = false;
-                }
+            if (child.type === "Mesh") {
+                child.material.wireframe = (mode === "wireframe");
             }
         });
         
         if (wireframe) {
-            wireframe.visible = mode === 'wireframe';
+            wireframe.visible = (mode === "wireframe");
         }
     }
 
     setSelected(selected) {
-        const color = selected ? 0xffff00 : 0x4a9eff;
+        const col = selected ? 0xffff00 : 0x4a9eff;
         this.mesh.children.forEach(child => {
-            if (child.type === 'Mesh') {
-                child.material.color.setHex(color);
+            if (child.type === "Mesh") {
+                child.material.color.setHex(col);
             }
         });
     }
 }
 
 
-
-
-// ============================================
-// HISTORY CLASS (Undo/Redo)
-// ============================================
-
-
-
-
+// History for undo/redo
 class History {
     constructor() {
         this.states = [];
@@ -917,24 +805,7 @@ class History {
 }
 
 
-
-// ============================================
-// START APPLICATION
-// ============================================
-
-
-
-
-console.log('app-main.js loaded');
-
-// initialize immediately 
-console.log('Initializing Tube Joint Visualizer...');
-try {
-    const app = new TubeJointVisualizer();
-    console.log('Tube Joint Visualizer initialized successfully!');
-    window.app = app; //  for debugging
-} catch (error) {
-    console.error('Failed to initialize app:', error);
-    throw error; // Re-throw so the loader can catch it
-}
+// init the app
+const app = new TubeJointVisualizer();
+window.app = app;
 

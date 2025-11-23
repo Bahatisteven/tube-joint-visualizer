@@ -115,8 +115,8 @@ An interactive 3D desktop application for designing and visualizing rectangular/
 | Action | Control |
 |--------|---------|
 | Select tube | Left-click on tube |
-| Drag tube | Left-click + drag selected tube |
-| Rotate camera | Left-click + drag on empty space |
+| Drag selected tube | Left-click + drag on selected tube |
+| Rotate camera | Left-click + drag on **empty space** |
 | Pan camera | Right-click + drag |
 | Zoom | Mouse wheel scroll |
 
@@ -134,8 +134,10 @@ An interactive 3D desktop application for designing and visualizing rectangular/
 | **E** | Rotate tube on Y-axis -15° |
 | **Q** | Rotate tube on X-axis +15° |
 | **W** | Rotate tube on X-axis -15° |
-| **Shift + R/E/Q/W** | Rotate 30° (double speed) |
+| **Shift + R/E/Q/W** | Rotate 30° (instead of 15°) |
 | **Delete / Backspace** | Delete selected tube |
+
+> **Note:** Keyboard controls require a tube to be selected first (click on it).
 
 ### UI Controls
 - **Add Tube** - Create a new tube with current dimensions
