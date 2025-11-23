@@ -136,14 +136,12 @@ An interactive 3D desktop application for designing and visualizing rectangular/
 | **W** | Rotate tube on X-axis -15° |
 | **Shift + R/E/Q/W** | Rotate 30° (double speed) |
 | **Delete / Backspace** | Delete selected tube |
-| **Ctrl + Z** | Undo |
-| **Ctrl + Y** | Redo |
 
 ### UI Controls
 - **Add Tube** - Create a new tube with current dimensions
-- **Delete Tube** - Remove the selected tube
+- **Delete Tube** - Remove the selected tube (or use Delete/Backspace key)
 - **Toggle Wireframe** - Switch between solid and wireframe mode
-- **Undo / Redo** - Navigate through edit history
+- **Undo / Redo** - Navigate through edit history (buttons only)
 
 ---
 
