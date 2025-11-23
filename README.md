@@ -198,6 +198,16 @@ ISC License - See LICENSE file for details.
 
 ## Screenshots
 
-*Screenshots will be added here showing the app in action*
+### Main Interface
+![Main Interface](docs/screenshots/main-interface.png)
+*Full application window with control panel, 3D workspace, and info display*
+
+### Joint Detection
+![Joint Detection](docs/screenshots/joint-detection.png)
+*Automatic joint detection with red markers and angle calculation*
+
+### Wireframe Mode
+![Wireframe Mode](docs/screenshots/wireframe-mode.png)
+*Wireframe view showing hollow tube structure*
 
 ---
