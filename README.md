@@ -103,7 +103,15 @@ This makes it easy to plan how tubes will connect before actually cutting or wel
 | Shift + R/E/Q/W | Rotate 30° instead of 15° |
 | Delete or Backspace | Remove selected tube |
 
-**Note:** Select a tube first by clicking on it before using keyboard controls.
+### UI Buttons
+| Button | Function |
+|--------|----------|
+| **Add Tube** | Create new tube with specified dimensions |
+| **↶ Undo** | Undo last action (up to 50 steps) |
+| **↷ Redo** | Redo previously undone action |
+| **Wireframe** | Toggle between solid and wireframe view |
+
+**Note:** Select a tube first (click on it) before using keyboard controls.
 
 ---
 
